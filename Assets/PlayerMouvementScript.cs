@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class PlayerMouvementScript : MonoBehaviour
 {
@@ -25,7 +26,7 @@ public class PlayerMouvementScript : MonoBehaviour
     [Header("IsGrounded")]
     [SerializeField] float _rayCastLength;
     [SerializeField] Transform _footPoint;
-    bool _isGrounded = true;
+    //bool _isGrounded = true;
 
     Vector2 _playerMouvement;
 
@@ -67,18 +68,19 @@ public class PlayerMouvementScript : MonoBehaviour
         }
 
         //Détection du sol
-
+        int _rayCastLayerMask = LayerMask.GetMask("Ground");
         Debug.DrawRay(_footPoint.position, Vector2.down * _rayCastLength, Color.green, 1f);
-        RaycastHit2D hit = Physics2D.Raycast(_footPoint.position, Vector2.down, _rayCastLength);
+        RaycastHit2D hit = Physics2D.Raycast(_footPoint.position, Vector2.down, _rayCastLength, _rayCastLayerMask);
 
-        if(hit.collider == null)
+        if(hit.collider != null)
         {
-            Debug.Log("Plouf dans l'eau");
-            _isGrounded = false;
+            //Debug.Log("Touché");
+            //_isGrounded = true;
         }
         else
         {
-            Debug.Log("Touché");
+            //Debug.Log("Plouf dans l'eau");
+            //_isGrounded = false;
         }
     }
 
@@ -86,29 +88,37 @@ public class PlayerMouvementScript : MonoBehaviour
     {
         _playerMouvement = obj.ReadValue<Vector2>();
         //_animator.SetBool("isWalking", true);
-        Debug.Log($"Touche enfoncée {_playerMouvement}");
+        //Debug.Log($"Touche enfoncée {_playerMouvement}");
 
     }
 
     private void UpdateMove(InputAction.CallbackContext obj)
     {
-        Debug.Log($"Joystick Update {_playerMouvement}");
+        //Debug.Log($"Joystick Update {_playerMouvement}");
     }
 
     private void EndMove(InputAction.CallbackContext obj)
     {
         _playerMouvement = new Vector2(0, 0);
         //_animator.SetBool("isWalking", false);
-        Debug.Log("Joystick Neutre");
+        //Debug.Log("Joystick Neutre");
     }
 
     private void StartJump(InputAction.CallbackContext obj)
     {
-        if(_isGrounded)
-        {
+        //if(_isGrounded)
+        //{
             _rb.AddForce(new Vector2(0, _jumpForce), ForceMode2D.Impulse);
-        }
+        //}
         
     }
 
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.gameObject.GetComponent<BeerScript>() != null)
+        {
+            Debug.Log("test");
+        }
+    }
 }
